@@ -1,2 +1,4 @@
+Implementation of Chess using boardgamearena's API. 
+
 Board PNG taken from http://commons.wikimedia.org/wiki/File:ExperimentalChessbaseChessBoard.png
 Piece PNGs taken from XBoard, GPL 3.
