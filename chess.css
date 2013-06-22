@@ -41,15 +41,14 @@
      Note: on the production platform, this file will be compressed and comments will be removed.
            Consequently, don't hesitate to put as many comments as necessary.
 */
-
-@import url(../csslayer.css); /* Note: you must not use any @import directive other than this one */
+@import url(../../../css/csslayer.css);
 
 /********* You can start writing your CSS below this line: **********/
 
 #board {
     width: 598px;
     height: 598px;
-    background-image: url('../../img/chess/board.png');
+    background-image: url('img/board.png');
     position: relative;
 }
 
@@ -63,7 +62,7 @@
 .piece {
     width: 64px;
     height: 64px;
-    background-image: url('../../img/chess/pieces.png');
+    background-image: url('img/pieces.png');
     position absolute; 
 }
 
@@ -84,11 +83,11 @@
     Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
 
     .white_token {
-        background-image: url('../../img/chess/tokens.png');
+        background-image: url('img/tokens.png');
         background-position: 0px 0px;
     }
     .black_token {
-        background-image: url('../../img/chess/tokens.png');
+        background-image: url('img/tokens.png');
         background-position: -20px 0px;
     }
     .token {

@@ -24,8 +24,8 @@ class Chess extends Table
 {
 	function Chess( )
 	{
-        require( APP_GAMEMODULE_PATH.'module/chess/material.inc.php' );	
- 
+
+	parent::__construct();
         // Your global variables labels:
         //  Here, you can assign labels to global variables you are using for this game.
         //  You can use any number of global variables with IDs between 10 and 99.

@@ -21,7 +21,7 @@ define([
     "ebg/counter"
 ],
 function (dojo, declare) {
-    return declare("ebg.chess", ebg.core.gamegui, {
+    return declare("bgagame.chess", ebg.core.gamegui, {
         constructor: function(){
             console.log('chess constructor');
               
