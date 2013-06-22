@@ -15,11 +15,14 @@ BGA_FILES=\
 	chess.js \
 	chess.view.php \
 	chess_chess.tpl \
+	chess.po \
 	dbmodel.sql \
 	gameoptions.inc.php \
 	material.inc.php \
+	ly_chess.js \
 	states.inc.php \
 	stats.inc.php \
+	version.php \
 	img/publisher.png \
 	img/game_icon.png \
 	img/game_box50.png \
@@ -33,7 +36,7 @@ BGA_USER=philsstein
 BGA_SERVER=1.studio.boardgamearena.com
 
 publish: $(BGA_FILES)
-	expect -c " \
+	@expect -c " \
 		spawn sftp ${BGA_USER}@${BGA_SERVER} ; \
 		expect password ; \
 		send \"${BGA_PASS}\n\" ; \
