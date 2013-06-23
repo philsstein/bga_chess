@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS `board` (
     `board_y` smallint(5) unsigned NOT NULL,
     `board_piece_color` varchar(16) DEFAULT NULL,
     `board_piece_name` varchar(16) DEFAULT NULL,
-    `active_piece` bit(1) DEFAULT 0,
-    `valid_move` bit(1) DEFAULT 0,
-    `last_most` bit(1) DEFAULT 0,
+    `active_piece` bit(1) NOT NULL DEFAULT 0,
+    `valid_move` bit(1) NOT NULL DEFAULT 0,
+    `last_move` bit(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`board_x`, `board_y`)
 ) ENGINE=InnoDB;

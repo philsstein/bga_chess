@@ -62,7 +62,8 @@ function (dojo, declare) {
                 this.addPieceToBoard(square.x, square.y, square.color, square.name);
             }
 
-            dojo.query('.square').connect('onClick', this, 'onClickSquare');
+            dojo.query('.piece').connect('onclick', this, 'onClickSquare');
+            dojo.query('.square').connect('onclick', this, 'onClickSquare');
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -181,14 +182,24 @@ function (dojo, declare) {
             dojo.stopEvent(evt);
 
             if (!this.checkAction('playerTurn')) {
+                console.log('checkAction failed in onClickSquare()');
                 return;
             }
 
+            var coords = evt.currentTarget.id.split('_');
+            var x = coords[1];
+            var y = coords[2];
+            
+            console.log('calling server side onClickSquare('+x+', '+y+')');
             this.ajaxcall("/chess/chess/onClickSquare.html", 
-                    { lock: true, x: 1, y: 2 }, 
+                    { lock: true, x: x, y: y }, 
                     this, 
-                    function(result) { }, 
-                    function(is_error) { });
+                    function(result) { 
+                        console.log('success calling onClickSquare.');
+                    }, 
+                    function(is_error) { 
+                        console.log('error calling onClickSquare.');
+                    });
         },
 
         ///////////////////////////////////////////////////
@@ -213,7 +224,16 @@ function (dojo, declare) {
         notif_pieceChosen: function(notif) {
             // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
             console.log('notif_pieceChosen');
-            console.log(notif);
+            console.log('args');
+            console.log(notif.args);
+            
+            dojo.query('.valid_move').removeClass('valid_move');
+            for (var square in notif.args.valid_moves) 
+                dojo.addClass('square_'+square[0]+'_'+square[1], 'valid_move');
+
+            dojo.query('.active_piece').removeClass('active_piece');
+            for (var square in notif.args.active_pieces) 
+                dojo.addClass('square_'+square[0]+'_'+square[1], 'active_piece');
         }, 
 
         notif_pieceMoved: function(notif) {

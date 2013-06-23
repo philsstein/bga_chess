@@ -194,7 +194,7 @@ class Chess extends Table
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-        $result['board'] = self::getObjectListFromDB("SELECT board_x x, board_y y, board_piece_color color, board_piece_name name FROM board where board_piece_color IS NOT NULL");
+        $result['board'] = self::getObjectListFromDB("SELECT board_x x, board_y y, board_piece_color color, board_piece_name name, active_piece active, valid_move valid, last_move last FROM board where board_piece_color IS NOT NULL");
   
         return $result;
     }
@@ -223,9 +223,57 @@ class Chess extends Table
 
     /*
         In this space, you can put any utility methods useful for your game logic
-    */
+     */
+    function getSquareData($x, $y) {
+        return self::getObjectFromDB("
+            SELECT board_piece_color piece_color, 
+                board_piece_name piece_name, active_piece active_piece,
+                valid_move valid_move, last_move last_move, board_x x, board_y y
+            FROM board
+            WHERE board_x=$x and board_y=$y");
+    }
 
+    function equalColor($sq_col, $play_col) {
+        if ($sq_col == "" || $play_col == "") {
+            return false;
+        }
+        if ($sq_col == 'white') {
+            if ($play_col == 'ffffff')
+                return true;
+        }
+        else {
+            if ($play_col == '000000')
+                return true;
+        }
+        return false;
+    }
 
+    function setValidMoves($square) {
+        self::debug('Setting valid moves for ' + $square['piece_color'] + ' ' +
+            $square['piece_name'] + ' at square ' + $square['x'] + ', ' +
+            $square['y']); 
+
+        // GTL NOOP for now. Add logic to set correct valid moves for 
+        // the chosen piece.
+        self::DbQuery('UPDATE board SET valid_move=0'); 
+
+        $x = $square['x']; 
+        $y = $square['y'];
+        if ($square['piece_name'] == 'pawn') { 
+            if ($square['piece_color'] == 'white') {
+                if ($square['x'] == 7) {
+                    self::DbQuery("
+                        UPDATE board
+                        SET valid_move=1 
+                        WHERE board_x=$x AND
+                        (board_y=$y-1 OR board_y=$y-2)");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+        
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
@@ -237,13 +285,62 @@ class Chess extends Table
     function clickSquare($x, $y) {
         self::checkAction("playerTurn");
 
-        $player_id = self::getActivePlayerId();
+        $square = self::getSquareData($x, $y); 
 
-        self::notifyAllPlayers("pieceChosen",
-            clienttranslate('${player_name} chose piece'),
-            array(
-                'x' => $x,
-                'y' => $y));
+        if ($square['active_piece'] == "" && $square['valid_move'] == "") {
+            self::debug("user clicked square without a piece or possible move.");
+            // GTL - what is proper return action here?
+            return;
+        }
+
+        $player_id = self::getActivePlayerId();
+        $player_color = self::getUniqueValueFromDB("SELECT player_color FROM player 
+            WHERE player_id='$player_id'"); 
+
+        # four cases: 
+        # 1. clicked empty square - do nothing.
+        # 2. clicked own piece - set to active piece and mark valid moves.
+        # 3. clicked valid move - move the piece, clear active piece and valid moves
+        # 4. click opponet's piece - same as 3.
+
+        # case 1.
+        if ($square['piece_name'] == "" && $square['valid_move'] == "") {
+            self::debug('empty square clicked on.');
+            return;
+        }
+
+        # case 2
+        if (self::equalColor($square['piece_color'], $player_color)) {
+            self::debug('user clicked own ' + $square['piece_color'] + ' piece.');
+            if (false == self::setValidMoves($square) ) {
+                // GTL How do we notify of error?
+                die('That piece has no valid moves.');
+            }
+            self::DbQuery("UPDATE board SET active_piece=0");
+            self::DbQuery("UPDATE board SET active_piece=1
+                WHERE board_x=$x and board_y=$y");
+            
+            $valid_moves = self::getObjectListFromDB("
+                SELECT board_x x, board_y y
+                FROM board
+                WHERE valid_move=1"); 
+            $active_pieces = self::getObjectListFromDB("
+                SELECT board_x x, board_y y
+                FROM board
+                WHERE active_piece=1"); 
+            self::notifyAllPlayers("pieceChosen", "", array(
+                "valid_moves" => $valid_moves, 
+                "active_pieces" => $active_pieces));
+
+            $this->gamestate->nextState('playerTurn');
+        }
+
+        # self::notifyAllPlayers("pieceChosen",
+        #     clienttranslate('${player_name} chose piece'),
+        #     array(
+        #         'x' => $x,
+        #         'y' => $y));
+
     }
 
     /*

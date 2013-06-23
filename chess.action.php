@@ -38,9 +38,11 @@
       } 
 
       public function onClickSquare() {
+          self::debug('onClickSquare() called.');
           self::setAjaxMode();
-          $x = self.getArg("x", AT_posint, true);   
-          $y = self.getArg("y", AT_posint, true);   
+          $x = self::getArg("x", AT_posint, true);   
+          $y = self::getArg("y", AT_posint, true);   
+          self::debug("calling clickSquare($x, $y)"); 
           $this->game->clickSquare($x, $y); 
           self::ajaxResponse();
       }

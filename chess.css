@@ -79,11 +79,11 @@
 .piece_black_king { background-position: -256px -64px; }
 .piece_black_pawn { background-position: -320px -64px; }
 
-.piece_active {
+.active_piece {
     background-color: red;
 }
 
-.possible_move {
+.valid_move {
     background-color: white;
     opacity: 0.2; 
     filter:alpha(opacity=20); /* For IE8 and earlier */
