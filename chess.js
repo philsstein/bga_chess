@@ -61,7 +61,8 @@ function (dojo, declare) {
                 var square = gamedatas.board[i];
                 this.addPieceToBoard(square.x, square.y, square.color, square.name);
             }
-            
+
+            dojo.query('.square').connect('onClick', this, 'onClickSquare');
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -154,13 +155,6 @@ function (dojo, declare) {
 
         ///////////////////////////////////////////////////
         //// Utility methods
-        
-        /*
-        
-            Here, you can defines some utility methods that you can use everywhere in your javascript
-            script.
-        
-        */
         addPieceToBoard: function(x, y, color, name) {
             console.log('adding piece');
             dojo.place(this.format_block('jstp_piece', {
@@ -173,59 +167,32 @@ function (dojo, declare) {
             this.slideToObject('piece_'+x+'_'+y, 'square_'+x+'_'+y).play();
         },
 
-
         ///////////////////////////////////////////////////
         //// Player's action
-        
         /*
-        
             Here, you are defining methods to handle player's action (ex: results of mouse click on 
             game objects).
-            
             Most of the time, these methods:
             _ check the action is possible at this game state.
             _ make a call to the game server
-        
         */
-        
-        /* Example:
-        
-        onMyMethodToCall1: function( evt )
-        {
-            console.log( 'onMyMethodToCall1' );
-            
-            // Preventing default browser reaction
-            dojo.stopEvent( evt );
+        onClickSquare: function(evt) {
+            console.log('onClickSquare');
+            dojo.stopEvent(evt);
 
-            // Check that this action is possible (see "possibleactions" in states.inc.php)
-            if( ! this.checkAction( 'myAction' ) )
-            {   return; }
+            if (!this.checkAction('playerTurn')) {
+                return;
+            }
 
-            this.ajaxcall( "/chess/chess/myAction.html", { 
-                                                                    lock: true, 
-                                                                    myArgument1: arg1, 
-                                                                    myArgument2: arg2,
-                                                                    ...
-                                                                 }, 
-                         this, function( result ) {
-                            
-                            // What to do after the server call if it succeeded
-                            // (most of the time: nothing)
-                            
-                         }, function( is_error) {
+            this.ajaxcall("/chess/chess/onClickSquare.html", 
+                    { lock: true, x: 1, y: 2 }, 
+                    this, 
+                    function(result) { }, 
+                    function(is_error) { });
+        },
 
-                            // What to do after the server call in anyway (success or failure)
-                            // (most of the time: nothing)
-
-                         } );        
-        },        
-        
-        */
-
-        
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
-
         /*
             setupNotifications:
             
@@ -238,35 +205,21 @@ function (dojo, declare) {
         setupNotifications: function()
         {
             console.log( 'notifications subscriptions setup' );
-            
-            // TODO: here, associate your game notifications with local methods
-            
-            // Example 1: standard notification handling
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            
-            // Example 2: standard notification handling + tell the user interface to wait
-            //            during 3 seconds after calling the method in order to let the players
-            //            see what is happening in the game.
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            // 
+            dojo.subscribe('pieceChosen', this, "notif_pieceChosen");
+            dojo.subscribe('pieceMoved', this, "notif_pieceMoved");
+            this.notifqueue.setSynchronous('pieceMoved', 3000);
         },  
         
-        // TODO: from this point and below, you can write your game notifications handling methods
-        
-        /*
-        Example:
-        
-        notif_cardPlayed: function( notif )
-        {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
-            
+        notif_pieceChosen: function(notif) {
             // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-            
-            // TODO: play the card in the user interface.
-        },    
-        
-        */
+            console.log('notif_pieceChosen');
+            console.log(notif);
+        }, 
+
+        notif_pieceMoved: function(notif) {
+            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
+            console.log('notif_pieceMoved');
+            console.log(notif);
+        },
    });             
 });

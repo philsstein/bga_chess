@@ -230,11 +230,21 @@ class Chess extends Table
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
 //////////// 
-
     /*
         Each time a player is doing some game action, one of the methods below is called.
         (note: each method below must match an input method in chess.action.php)
-    */
+     */
+    function clickSquare($x, $y) {
+        self::checkAction("playerTurn");
+
+        $player_id = self::getActivePlayerId();
+
+        self::notifyAllPlayers("pieceChosen",
+            clienttranslate('${player_name} chose piece'),
+            array(
+                'x' => $x,
+                'y' => $y));
+    }
 
     /*
     

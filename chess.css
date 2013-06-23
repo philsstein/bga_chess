@@ -79,22 +79,14 @@
 .piece_black_king { background-position: -256px -64px; }
 .piece_black_pawn { background-position: -320px -64px; }
 
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
+.piece_active {
+    background-color: red;
+}
 
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
-
+.possible_move {
+    background-color: white;
+    opacity: 0.2; 
+    filter:alpha(opacity=20); /* For IE8 and earlier */
+    cursor: pointer;
+}
 

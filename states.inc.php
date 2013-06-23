@@ -57,43 +57,27 @@ $machinestates = array(
         "description" => clienttranslate("Game setup"),
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array( "" => 2 )
+        "transitions" => array( "" => 10 )
     ),
-    
-    // Note: ID=2 => your first state
 
-    2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must move a piece'),
-    		"descriptionmyturn" => clienttranslate('${you} must move a piece'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array( "movePiece" ),
-    		"transitions" => array( "movePiece" => 2 )
-    ),
-    
-/*
-    Examples:
-    
-    2 => array(
-        "name" => "nextPlayer",
-        "description" => '',
-        "type" => "game",
-        "action" => "stNextPlayer",
-        "updateGameProgression" => true,   
-        "transitions" => array( "endGame" => 99, "nextPlayer" => 10 )
-    ),
-    
     10 => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+        "description" => clienttranslate('${actplayer} must move a piece'),
+        "descriptionmyturn" => clienttranslate('${you} must move a piece'),
         "type" => "activeplayer",
-        "possibleactions" => array( "playCard", "pass" ),
-        "transitions" => array( "playCard" => 2, "pass" => 2 )
-    ), 
+        "possibleactions" => array( "playerTurn", "movePiece" ),
+        "transitions" => array( "movePiece" => 20 )
+    ),
 
-*/    
-   
+    20 => array(
+        "name" => "movePiece", 
+        "description" => clienttranslate('${actplayer} moved a piece'),
+        "descriptionmyturn" => clienttranslate('${you} moved a piece'),
+        "type" => "game",
+        "action" => "stPlayerTurn",
+        "transitions" => array( "playerTurn" => 10, "endGame" => 99 )
+    ),
+
     // Final state.
     // Please do not modify.
     99 => array(
