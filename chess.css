@@ -63,7 +63,7 @@
     width: 64px;
     height: 64px;
     background-image: url('img/pieces.png');
-    position absolute; 
+    position: absolute; 
 }
 
 .piece_white_rook { background-position: 0px 0px; }
@@ -81,12 +81,14 @@
 
 .active_piece {
     background-color: red;
+    opacity: 0.3; 
+    filter:alpha(opacity=20);  /* IE 8 */
 }
 
 .valid_move {
-    background-color: white;
-    opacity: 0.2; 
-    filter:alpha(opacity=20); /* For IE8 and earlier */
+    background-color: green;
+    opacity: 0.4; 
+    filter:alpha(opacity=20);  /* IE 8 */
     cursor: pointer;
 }
 

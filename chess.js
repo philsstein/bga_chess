@@ -196,9 +196,6 @@ function (dojo, declare) {
                     this, 
                     function(result) { 
                         console.log('success calling onClickSquare.');
-                    }, 
-                    function(is_error) { 
-                        console.log('error calling onClickSquare.');
                     });
         },
 
@@ -224,16 +221,17 @@ function (dojo, declare) {
         notif_pieceChosen: function(notif) {
             // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
             console.log('notif_pieceChosen');
-            console.log('args');
-            console.log(notif.args);
-            
+
             dojo.query('.valid_move').removeClass('valid_move');
-            for (var square in notif.args.valid_moves) 
-                dojo.addClass('square_'+square[0]+'_'+square[1], 'valid_move');
+            for (var i in notif.args.valid_moves) {
+                var pts = notif.args.valid_moves[i];
+                dojo.addClass('square_' + pts.x + '_' + pts.y, 'valid_move');
+            }
 
             dojo.query('.active_piece').removeClass('active_piece');
-            for (var square in notif.args.active_pieces) 
-                dojo.addClass('square_'+square[0]+'_'+square[1], 'active_piece');
+            for (var i in notif.args.active_pieces) 
+                var pts = notif.args.active_pieces[i];
+                dojo.addClass('square_' + pts.x + '_' + pts.y, 'active_piece');
         }, 
 
         notif_pieceMoved: function(notif) {

@@ -105,9 +105,9 @@ class Chess extends Table
                 $name = "NULL";
                 $color = "NULL";
 
-                if ($x==1) {
+                if ($y==1) {
                     $color = "'black'";
-                    switch ($y) {
+                    switch ($x) {
                     case 1:
                     case 8:
                         $name = "'rook'";
@@ -128,17 +128,17 @@ class Chess extends Table
                         break;
                     }
                 }
-                else if ($x==2) {
+                else if ($y==2) {
                     $color = "'black'";
                     $name = "'pawn'";
                 }
-                else if ($x==7) {
+                else if ($y==7) {
                     $color = "'white'";
                     $name = "'pawn'";
                 }
-                else if ($x==8) {
+                else if ($y==8) {
                     $color = "'white'"; 
-                    switch ($y) {
+                    switch ($x) {
                     case 1:
                     case 8:
                         $name = "'rook'";
@@ -261,13 +261,23 @@ class Chess extends Table
         $y = $square['y'];
         if ($square['piece_name'] == 'pawn') { 
             if ($square['piece_color'] == 'white') {
-                if ($square['x'] == 7) {
+                if ($square['y'] == 7) {
                     self::DbQuery("
                         UPDATE board
                         SET valid_move=1 
                         WHERE board_x=$x AND
                         (board_y=$y-1 OR board_y=$y-2)");
                     return true;
+                }
+                else {
+                    if ($square['y'] == 2) {
+                        self::DbQuery("
+                            UPDATE board
+                            SET valid_move=1 
+                            WHERE board_x=$x AND
+                            (board_y=$y+1 OR board_y=$y+2)");
+                        return true;
+                    }
                 }
             }
         }

@@ -45,8 +45,8 @@
         for ( $i=1; $i<=8; $i++ ) {
             for ( $j=1; $j<=8; $j++ ) {
                 $this->page->insert_block("square", array(
-                    'X' => $i, 
-                    'Y' => $j, 
+                    'X' => $j, 
+                    'Y' => $i, 
                     'LEFT' => round(($j-1)*$scale+$offset ),
                     'TOP' => round(($i-1)*$scale+$offset )
                 ));
