@@ -81,14 +81,14 @@
 
 .active_piece {
     background-color: red;
-    opacity: 0.3; 
-    filter:alpha(opacity=20);  /* IE 8 */
+    opacity: 0.4; 
+    filter:alpha(opacity=40);  /* IE 8 */
 }
 
 .valid_move {
     background-color: green;
     opacity: 0.4; 
-    filter:alpha(opacity=20);  /* IE 8 */
+    filter:alpha(opacity=40);  /* IE 8 */
     cursor: pointer;
 }
 

@@ -225,13 +225,29 @@ function (dojo, declare) {
             dojo.query('.valid_move').removeClass('valid_move');
             for (var i in notif.args.valid_moves) {
                 var pts = notif.args.valid_moves[i];
-                dojo.addClass('square_' + pts.x + '_' + pts.y, 'valid_move');
+                var sq = 'square_' + pts.x + '_' + pts.y;
+                dojo.addClass(sq, 'valid_move');
+                var anim = dojo.fx.chain([
+                        dojo.fadeIn({node: sq}), 
+                        dojo.fadeOut({node: sq}), 
+                        dojo.fadeIn({node: sq}), 
+                        dojo.fadeOut({node: sq, 
+                            onEnd: function(node) {
+                                dojo.query('.valid_move').removeClass('valid_move');
+                            }})]);
+                anim.play();
             }
 
             dojo.query('.active_piece').removeClass('active_piece');
             for (var i in notif.args.active_pieces) 
                 var pts = notif.args.active_pieces[i];
-                dojo.addClass('square_' + pts.x + '_' + pts.y, 'active_piece');
+                var sq = 'square_' + pts.x + '_' + pts.y;
+                dojo.addClass(sq, 'active_piece');
+                var anim = dojo.fx.chain([
+                        dojo.fadeIn({node: sq}), 
+                        dojo.fadeOut({node: sq}), 
+                        dojo.fadeIn({node: sq})]); 
+                anim.play();
         }, 
 
         notif_pieceMoved: function(notif) {

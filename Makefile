@@ -38,6 +38,8 @@ BGA_SERVER=1.studio.boardgamearena.com
 publish: $(BGA_FILES)
 	@expect -c " \
 		spawn sftp ${BGA_USER}@${BGA_SERVER} ; \
+        expect password ; \
+		send \"${BGA_PASS}\n\" ; \
 		expect sftp ; \
 		send \"cd ${BGA_GAME}\n\" ; \
 		foreach file {$?} { \
