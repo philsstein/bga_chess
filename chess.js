@@ -24,42 +24,22 @@ function (dojo, declare) {
     return declare("bgagame.chess", ebg.core.gamegui, {
         constructor: function(){
             console.log('chess constructor');
-              
-            // Here, you can init the global variables of your user interface
-            // Example:
-            // this.myGlobalValue = 0;
-
+            
         },
         
-        /*
-            setup:
-            
-            This method must set up the game user interface according to current game situation specified
-            in parameters.
-            
-            The method is called each time the game interface is displayed to a player, ie:
-            _ when the game starts
-            _ when a player refreshes the game page (F5)
-            
-            "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
-        */
-        
-        setup: function( gamedatas )
-        {
+        setup: function( gamedatas ) {
             console.log( "Starting game setup" );
             
             // Setting up player boards
-            for( var player_id in gamedatas.players )
-            {
-                var player = gamedatas.players[player_id];
-                         
-                // TODO: Setting up players boards if needed
-            }
+            this.color_white = true;
+            if (gamedatas.players[this.player_id].color != 'ffffff') 
+                this.color_white = false;
             
             // TODO: Set up your game interface here, according to "gamedatas"
             for (var i in gamedatas.board) {
                 var square = gamedatas.board[i];
-                this.addPieceToBoard(square.x, square.y, square.color, square.name);
+                var sq = this.transform(square.x, square.y);  // black v. white placement
+                this.addPieceToBoard(sq.x, sq.y, square.color, square.name);
             }
 
             dojo.query('.piece').connect('onclick', this, 'onClickSquare');
@@ -157,6 +137,7 @@ function (dojo, declare) {
         ///////////////////////////////////////////////////
         //// Utility methods
         addPieceToBoard: function(x, y, color, name) {
+            // note: x, y must be already transformed here.
             console.log('adding piece');
             dojo.place(this.format_block('jstp_piece', {
                 color: color,
@@ -168,6 +149,12 @@ function (dojo, declare) {
             this.slideToObject('piece_'+x+'_'+y, 'square_'+x+'_'+y).play();
         },
 
+        transform: function(x, y) {
+            if (!this.color_white)
+                return { x: (9-x), y: (9-y) }; 
+            else 
+                return { x: x, y: y }; 
+        },
         ///////////////////////////////////////////////////
         //// Player's action
         /*
@@ -187,12 +174,11 @@ function (dojo, declare) {
             }
 
             var coords = evt.currentTarget.id.split('_');
-            var x = coords[1];
-            var y = coords[2];
+            var sq = this.transform(coords[1], coords[2]); 
             
-            console.log('calling server side onClickSquare('+x+', '+y+')');
+            console.log('calling server side onClickSquare('+sq.x+', '+sq.y+')');
             this.ajaxcall("/chess/chess/onClickSquare.html", 
-                    { lock: true, x: x, y: y }, 
+                    { lock: true, x: sq.x, y: sq.y }, 
                     this, 
                     function(result) { 
                         console.log('success calling onClickSquare.');
@@ -201,15 +187,6 @@ function (dojo, declare) {
 
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
-        /*
-            setupNotifications:
-            
-            In this method, you associate each of your game notifications with your local method to handle it.
-            
-            Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your chess.game.php file.
-        
-        */
         setupNotifications: function()
         {
             console.log( 'notifications subscriptions setup' );
@@ -224,8 +201,9 @@ function (dojo, declare) {
 
             dojo.query('.valid_move').removeClass('valid_move');
             for (var i in notif.args.valid_moves) {
-                var pts = notif.args.valid_moves[i];
-                var sq = 'square_' + pts.x + '_' + pts.y;
+                var tmp = notif.args.valid_moves[i];
+                var xy = this.transform(tmp.x, tmp.y); 
+                var sq = 'square_' + xy.x + '_' + xy.y;
                 dojo.addClass(sq, 'valid_move');
                 var anim = dojo.fx.chain([
                         dojo.fadeIn({node: sq}), 
@@ -240,8 +218,9 @@ function (dojo, declare) {
 
             dojo.query('.active_piece').removeClass('active_piece');
             for (var i in notif.args.active_pieces) 
-                var pts = notif.args.active_pieces[i];
-                var sq = 'square_' + pts.x + '_' + pts.y;
+                var tmp = notif.args.active_pieces[i];
+                var xy = this.transform(tmp.x, tmp.y); 
+                var sq = 'square_' + xy.x + '_' + xy.y;
                 dojo.addClass(sq, 'active_piece');
                 var anim = dojo.fx.chain([
                         dojo.fadeIn({node: sq}), 
@@ -251,9 +230,14 @@ function (dojo, declare) {
         }, 
 
         notif_pieceMoved: function(notif) {
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
             console.log('notif_pieceMoved');
-            console.log(notif);
+            console.log(notif.args);
+            var from_xy = this.transform(notif.args.from.x, notif.args.from.y); 
+            var to_xy = this.transform(notif.args.to.x, notif.args.to.y); 
+            var from_sq = 'piece_' + from_xy.x + '_' + from_xy.y;
+            var to_sq = 'square_' + to_xy.x + '_' + to_xy.y; 
+            this.slideToObject(from_sq, to_sq).play(); 
+            dojo.query('.active_piece').removeClass('active_piece'); 
         },
    });             
 });
