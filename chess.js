@@ -151,7 +151,7 @@ function (dojo, declare) {
 
         transform: function(x, y) {
             if (!this.color_white)
-                return { x: (9-x), y: (9-y) }; 
+                return { x: x, y: (9-y) }; 
             else 
                 return { x: x, y: y }; 
         },
