@@ -61,6 +61,20 @@ assert(!$board->has_piece(5, 2));
 assert($p == new Pawn(Colors::black));
 echo $board;
 
+show_moves(2,1,$board); // knight moves
+$vm = $board->get_piece(2,1)->valid_moves(2, 1, $board);  // knight
+assert($vm == array(array(1,3), array(3,3))); 
+
+$board->move_piece(2,1,3,3); 
+echo $board;
+show_moves(3,3,$board); // knight moves
+// hand computed valid moves. 
+$moves = array(array(2,5),array(4,5),array(1,4),array(5,4),array(2,1),array(5,2)); 
+$vm = $board->get_piece(3,3)->valid_moves(3, 3, $board);  // white knight @ 3,3
+assert($moves == $vm); 
+
+show_moves(5,1,$board); 
+echo $moves
 
 
 ?>

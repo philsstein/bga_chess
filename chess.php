@@ -26,13 +26,21 @@ class Color {
 class Board {
     // lower left is 1,1 upper left is 8,8
     private $board = array(); 
+
+    // public methods
+    public function on_board($x, $y) { 
+        if ($x < 1 || $x > 8 || $y < 1 || $y > 9) 
+            return False;
+        return True;
+    }
+
     public function __construct() {
         for ($i = 1; $i < 9; $i++)
             for ($i = 1; $i < 9; $i++)
                 $this->board[$i][$j] = NULL;
         for ($i = 1; $i < 9; $i++) {
-            $this->board[$i][2] = new Pawn(Colors::white); 
-            $this->board[$i][7] = new Pawn(Colors::black);
+            $this->put_piece($i, 2, new Pawn(Colors::white)); 
+            $this->put_piece($i, 7, new Pawn(Colors::black)); 
         }
         $this->put_piece(1, 1, new Rook(Colors::white)); 
         $this->put_piece(2, 1, new Knight(Colors::white)); 
@@ -123,9 +131,14 @@ abstract class Piece {
         $this->color = $color;
         $this->name = $name;
     }
-    public function __toString() {
+    public function __tostring() {
         // return($this->color . ' ' . $this->name); 
         return(strtoupper($this->color[0] . $this->name[0]));
+    }
+    public function is_takable_piece($x, $y, $board) {
+        if ($board->has_piece($x, $y) && $board->get_piece($x, $y)->color != $this->color)
+            return True;
+        return False;
     }
     abstract protected function valid_moves($x, $y, $board); 
 }
@@ -147,16 +160,12 @@ class Pawn extends Piece {
                     $ret[] = array($x, 4); 
             }
             if ($x != 1) { 
-                if ($board->has_piece($x-1, $y+1) &&
-                    $board->get_piece($x-1, $y+1)->color != $this->color) {
-                        $ret[] = array($x-1, $y+1);
-                    }
+                if ($this->is_takable_piece($x-1, $y+1, $board))
+                    $ret[] = array($x-1, $y+1);
             }
             if ($x != 8) { 
-                if ($board->has_piece($x+1, $y+1) && 
-                    $board->get_piece($x+1, $y+1)->color != $this->color) {
-                        $ret [] = array($x+1, $y+1); 
-                    }
+                if ($this->is_takable_piece($x+1, $y+1, $board))
+                    $ret [] = array($x+1, $y+1); 
             }
         } 
         else {    // black piece. inverse probably a better way to do this.
@@ -169,16 +178,12 @@ class Pawn extends Piece {
                     $ret[] = array($x, 5); 
             }
             if ($x != 1) { 
-                if ($board->has_piece($x-1, $y-1) &&
-                    $board->get_piece($x-1, $y-1)->color != $this->color) {
-                        $ret[] = array($x-1, $y-1);
-                    }
+                if ($this->is_takable_piece($x-1, $y-1, $board))
+                    $ret[] = array($x-1, $y-1);
             }
             if ($x != 8) { 
-                if ($board->has_piece($x+1, $y-1) && 
-                    $board->get_piece($x+1, $y-1)->color != $this->color) {
+                if ($this->is_takable_piece($x+1, $y-1))
                         $ret [] = array($x+1, $y-1); 
-                    }
             }
         }
         return $ret;
@@ -199,7 +204,26 @@ class Knight extends Piece {
     public function __construct($color) {
         parent::__construct($color, 'knight'); 
     }
+    public function __tostring() {
+        // override knight to string as both king and Knight start w/K.
+        return(strtoupper($this->color[0] . "N")); 
+    }
     public function valid_moves($x, $y, $board) {
+        $ret = array();
+        $offsets = array(
+            array(-1, 2), array( 1, 2), array(-2, 1), array( 2, 1), 
+            array(-1,-2), array( 1,-2), array(-2,-1), array( 2,-1));
+        foreach ($offsets as $offset) {  // php 5.5 use as list($xoff, $yoff) {
+            $test_x = $x+$offset[0]; 
+            $test_y = $y+$offset[1]; 
+            if (!$board->on_board($test_x, $test_y))
+                continue; 
+            if ($this->is_takable_piece($test_x, $test_y, $board)) 
+                $ret [] = array($test_x, $test_y); 
+            elseif (!$board->has_piece($test_x, $test_y))
+                $ret [] = array($test_x, $test_y); 
+        }
+        return $ret;
     }
 }
 
@@ -224,5 +248,21 @@ class King extends Piece {
         parent::__construct($color, 'king'); 
     }
     public function valid_moves($x, $y, $board) {
+        $ret = array();
+        $offsets = array(
+            array(-1,-1), array(-1, 0), array(-1, 1), 
+            array( 0,-1),               array( 0, 1), 
+            array( 1,-1), array( 1, 0), array( 1, 1)); 
+        foreach ($offsets as $offset) {  // php 5.5 use as list($xoff, $yoff) {
+            $test_x = $x+$offset[0]; 
+            $test_y = $y+$offset[1]; 
+            if (!$board->on_board($test_x, $test_y))
+                continue; 
+            if ($this->is_takable_piece($test_x, $test_y, $board)) 
+                $ret [] = array($test_x, $test_y); 
+            elseif (!$board->has_piece($test_x, $test_y))
+                $ret [] = array($test_x, $test_y); 
+        }
+        return $ret;
     }
 }
