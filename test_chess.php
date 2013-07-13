@@ -22,6 +22,7 @@ $p1 = new Pawn(Colors::black);
 assert($p1->color == Colors::black);
 
 $board = new Board();
+$board->move_piece(4, 7, 4, 3); 
 echo $board; 
 
 function show_moves($x, $y, $board) {
@@ -52,5 +53,14 @@ show_moves(3,2,$board);
 show_moves(4,2,$board); 
 show_moves(5,2,$board); 
 show_moves(4,7,$board); 
+
+$p = $board->take_piece(5, 2, 4, 3); 
+assert($p != NULL); 
+assert($board->has_piece(4, 3)); 
+assert(!$board->has_piece(5, 2)); 
+assert($p == new Pawn(Colors::black));
+echo $board;
+
+
 
 ?>
