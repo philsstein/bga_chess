@@ -145,7 +145,7 @@ abstract class Piece {
 
 class Pawn extends Piece {
     private $moved = False;
-    private $passant = False;
+    public $passant = False;
     public function __construct($color) {
         parent::__construct($color, 'pawn'); 
     }
@@ -166,6 +166,15 @@ class Pawn extends Piece {
             if ($x != 8) { 
                 if ($this->is_takable_piece($x+1, $y+1, $board))
                     $ret [] = array($x+1, $y+1); 
+            }
+            // en passant
+            if ($x == 5) { 
+                if ($board->has_piece(5, $y-1) && $board->get_piece(5, $y-1)->name == 'pawn' && 
+                    ((Pawn)$board->get_piece(5, $y-1))->passant)
+                    $ret [] = array(4, $y-1);
+                elseif ($board->has_piece(5, $y+1) && $board->get_piece(5, $y+1)->name == 'pawn' && 
+                    ((Pawn)$board->get_piece(5, $y+1))->passant)
+                    $ret [] = array(4, $y+1);
             }
         } 
         else {    // black piece. inverse probably a better way to do this.
